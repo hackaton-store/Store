@@ -10,7 +10,8 @@ class BankCardSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
         extra_kwargs = {
-                'card_holder': {'read_only': True}}
+                'card_holder': {'read_only': True},
+                'balance': {'read_only': True}}
 
 
     def create(self, validated_data):
