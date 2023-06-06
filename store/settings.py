@@ -44,7 +44,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'account', #askat's app
-    'bank_card'
+    'bank_card',
+    'product',
+    'django_filters',
+
 ]
 
 MIDDLEWARE = [

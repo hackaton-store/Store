@@ -1,6 +1,10 @@
 from django.urls import path
 
-from .views import RegistrationView, ActivationView, LoginView, LogoutView, ChangePasswordView, DropPasswordView, ChangeForgottenPasswordView
+from .views import (
+    RegistrationView, ActivationView, LoginView, 
+    LogoutView, ChangePasswordView, DropPasswordView, 
+    ChangeForgottenPasswordView
+) 
 
 
 
