@@ -31,6 +31,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_moderator = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=10, blank=True)
 
     REQUIRED_FIELDS = ['email']
