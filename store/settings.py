@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'account', #askat's app
     'bank_card',
     'product',
+    'django_filters',
+
 ]
 
 MIDDLEWARE = [
