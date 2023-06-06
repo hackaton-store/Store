@@ -39,7 +39,6 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def has_module_perms(self, app_label):
-        print(app_label)
         return self.is_staff
     
     def has_perm(self, obj=None):
