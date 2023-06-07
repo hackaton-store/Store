@@ -195,6 +195,7 @@ class UserSerializer(serializers.ModelSerializer):
         representation['likes_given'] = len(representation['likes_given'])
         representation['likes_recieved'] = len(representation['likes_recieved'])
         representation['reviews_recieved'] = [{one.user.username: one.review_text} for one in instance.reviews_recieved.all()]
+        representation['reviews_given'] = len(representation['reviews_given'])
 
 
         return representation

@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 
 from user_reviews.models import Review, Like
@@ -77,6 +79,15 @@ class LikeSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         self.validated_data['user'] = user
         return super().save(**kwargs)
+    
+
+    def update(self, instance, validated_data):
+        
+        raise serializers.ValidationError({'message': 'method not allowed'})
+
+
+    def partial_update(self, instance, validated_data):
+        return self.update(instance, validated_data)
     
 
     list_serializer_class = AbstractListSerializer
