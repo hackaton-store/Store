@@ -17,12 +17,14 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, password, **extra_info):
         extra_info.setdefault('is_active', False)
         extra_info.setdefault('is_staff', False)
+        extra_info.setdefault('is_moderator', False)
         return self._create(username, email, password, **extra_info)
     
 
     def create_superuser(self, username, email, password, **extra_info):
         extra_info.setdefault('is_active', True)
         extra_info.setdefault('is_staff', True)
+        extra_info.setdefault('is_moderator', True)
         return self._create(username, email, password, **extra_info)
     
 
