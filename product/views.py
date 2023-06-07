@@ -4,9 +4,10 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.request import Request
 
+
 from django_filters import rest_framework as filters
 
-from permissions.permissions import IsOwner, IsModerator
+from permissions.permissions import IsOwner, IsModeratorOrIsAdminUser
 from product.models import Car
 from product.serializers import CarSerializer
 
@@ -37,13 +38,27 @@ class CarViewSet(ModelViewSet):
         return Response(serializer.data)
 
     def get_permissions(self):
-        if self.request.method == "GET":
-            self.permission_classes = [AllowAny]
-        elif self.request.method == "POST":
-            self.permission_classes = [IsAuthenticated]
+        if self.request.data.get('status'):
+            if self.request.method in ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']:
+                self.permission_classes = [IsModeratorOrIsAdminUser]
+                print('ZAPROS NA STAFF')
+
+            # elif self.request.method in ['DELETE', 'PATCH', 'PUT'] and self.request.data.get('status'):
         else:
-            self.permission_classes = [IsOwner, IsAdminUser, IsModerator]
+            if self.request.method == "GET":
+                self.permission_classes = [AllowAny]
+            elif self.request.method == "POST":
+                self.permission_classes = [IsAuthenticated]
+            elif self.request.method in ['DELETE', 'PATCH', 'PUT']:
+                self.permission_classes in [IsOwner, IsModeratorOrIsAdminUser]
+                print('ZAPROS NA OWNER')
+        
+        print(self.request.data.get('status'))
         return super().get_permissions()
+    
+    
+    
+
     
 
 
