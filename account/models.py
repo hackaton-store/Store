@@ -22,6 +22,9 @@ class UserManager(BaseUserManager):
     
 
     def create_superuser(self, username, email, password, **extra_info):
+        extra_info.setdefault('name', 'dalbaep')
+        extra_info.setdefault('age', 18)
+        extra_info.setdefault('city', 'yopta')
         extra_info.setdefault('is_active', True)
         extra_info.setdefault('is_staff', True)
         extra_info.setdefault('is_moderator', True)
@@ -31,6 +34,10 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
+    name = models.CharField(max_length=50)
+    age = models.PositiveIntegerField()
+    city = models.CharField(max_length=300, blank=True)
+    phone_number = models.CharField(max_length=15)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_moderator = models.BooleanField(default=False)

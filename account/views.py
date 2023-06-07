@@ -1,14 +1,17 @@
 from rest_framework.generics import CreateAPIView, DestroyAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_202_ACCEPTED, HTTP_200_OK 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
 
-from .serializers import RegistrationSerializer, ActivationSerializer, LoginSerializer, ChangePasswordSerializer, DropPasswordSerializer, ChangeForgottenPassword
+from account.serializers import RegistrationSerializer, ActivationSerializer, LoginSerializer, ChangePasswordSerializer, DropPasswordSerializer, ChangeForgottenPassword, UserSerializer
 
 
+User = get_user_model()
 
 class RegistrationView(CreateAPIView):
     serializer_class = RegistrationSerializer
@@ -69,3 +72,12 @@ class ChangeForgottenPasswordView(CreateAPIView):
         serializer.set_new_password()
         return Response({'message': 'Password changed successfully'}, status=HTTP_200_OK)
     
+
+class UserView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response("User not found", status=404)
