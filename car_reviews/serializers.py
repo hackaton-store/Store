@@ -23,6 +23,16 @@ class CommentSerializer(serializers.ModelSerializer):
         return super().save(**kwargs)
 
 
+    def update(self, instance, validated_data):
+        instance.text = validated_data.get('text', instance.text)
+        instance.save()
+        return instance
+
+
+    def partial_update(self, instance, validated_data):
+        return self.update(instance, validated_data)
+
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['car'] = instance.car.brand
@@ -55,6 +65,14 @@ class SavedSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
 
+    def update(self, instance, validated_data):
+        raise serializers.ValidationError('You already saved this product')
+
+
+    def partial_update(self, instance, validated_data):
+        return self.update(instance, validated_data)
+
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['user'] = instance.user.username
@@ -84,6 +102,16 @@ class RatingSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         self.validated_data['user'] = user
         return super().save(**kwargs)
+
+
+    def update(self, instance, validated_data):
+        instance.rate = validated_data.get('rate', instance.rate)
+        instance.save()
+        return instance
+
+
+    def partial_update(self, instance, validated_data):
+        return self.update(instance, validated_data)
 
 
     def validate(self, attrs):
