@@ -21,7 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     path('api/v1/auth/', include('account.urls')),
-    # path('api/v1/auth/', include('bank_card.urls'))
-    path('products/', include('product.urls'))
+    # path('api/v1/auth/', include('bank_card.urls')),
+    path('products/', include('product.urls')),
+    path('api/v1/', include('car_reviews.urls')),
+    path('api/v1/', include('user_reviews.urls')),
 
 ]
