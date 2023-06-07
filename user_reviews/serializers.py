@@ -12,15 +12,26 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['user', 'text', 'created_at']
+        fields = ['review_text', 'to']
         
-        read_only_fields = ['user', 'created_at',]
+        read_only_fields = ['user', 'created_at']
     
 
     def save(self, **kwargs):
         user = self.context.get('request').user
         self.validated_data['user'] = user
         return super().save(**kwargs)
+
+
+    def update(self, instance, validated_data):
+        instance.review_text = validated_data.get('review_text', instance.review_text)
+        instance.save()
+        return instance
+
+
+    def partial_update(self, instance, validated_data):
+        return self.update(instance, validated_data)
+    
 
 
     def to_representation(self, instance):

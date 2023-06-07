@@ -13,6 +13,7 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
 
 
+
     def get_permissions(self):
         if self.request.method == 'POST':
             self.permission_classes = [IsAuthenticated]
