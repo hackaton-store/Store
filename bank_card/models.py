@@ -6,3 +6,4 @@ class BankCard(models.Model):
     card_number = models.BigIntegerField()
     cvv = models.IntegerField(validators=[MaxValueValidator(999)])
     balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+
