@@ -9,77 +9,72 @@ from product.models import Car
 User = get_user_model()
 
 
-class BalanceCreateSerializer(serializers.Serializer):
-
-
+class BalanceSerializer(serializers.ModelSerializer):
+   
+   
     class Meta:
 
         model = Balance
-        
-        fields = '__all__'
+        fields = ['user', 'total_balance']
         read_only_fields = ['user']
 
 
-  
-    def save(self, **kwargs):
-        user = self.context.get('request').user
-        balance_exists = Balance.objects.filter(user=user).exists()
-
-        if balance_exists:
-            raise serializers.ValidationError('you already have a balance account')
-        self.validated_data['user'] = user
-        return super().save(**kwargs)
-    
-
-
-class BalanceDepositeSerializer(serializers.Serializer):
-
-    deposit = serializers.DecimalField(max_digits=9, decimal_places=2)
-
-
-    class Meta:
-        model = Balance
-        
-        fields = '__all__'
-        read_only_fields = ['user']
-
-    def update(self, instance, validated_data):
-        deposit = validated_data.pop('deposit')
-        instance.balance += deposit
-        instance.save()
-        return instance
-
-
-    def partial_update(self, instance, validated_data):
-        return self.update(instance, validated_data)
-    
-
-
-class TransactionSerializer(serializers.Serializer):
-
-    username = serializers.CharField()
-    product = serializers.IntegerField()
-    price = serializers.DecimalField(max_digits=9, decimal_places=2)
-    
-    class Meta:
-        
-        fields = '__all__'
-        read_only_fields = ['username', 'price']
-
-    
     def create(self, validated_data):
-        username = self.context.get('request').user.username
-        product = Car.objects.get(id=product)
-        product_price = product.price
-        user = User.objects.get(username=username)
-        balance = user.balance.first()
-        balance.total_balance -= product_price
+        request = self.context['request']
+        user = validated_data.get('user', request.user)
+
+        
+        if hasattr(user, 'balance'):
+            raise serializers.ValidationError('You have already created a balance.')
+
+        balance = Balance.objects.create(user=user)
+        return balance
+
+
+
+class BalanceTopUpSerializer(serializers.Serializer):
+
+    amount = serializers.DecimalField(max_digits=9, decimal_places=2)
+
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('Amount must be a positive number')
+        return value
+
+    
+    
+class TransactionHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransactionHistory
+        fields = '__all__'
+        read_only_fields = ['user', 'transaction_time']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        product_id = validated_data['product']
+
+        try:
+            balance = Balance.objects.get(user=user)
+        except Balance.DoesNotExist:
+            raise serializers.ValidationError("User balance does not exist")
+
+        # Получение цены продукта по его идентификатору
+        try:
+            product = Car.objects.get(id=product_id)
+            price = product.price
+        except Car.DoesNotExist:
+            raise serializers.ValidationError("Product does not exist")
+
+        if balance.total_balance < price:
+            raise serializers.ValidationError("Insufficient balance")
+
+        # Уменьшение баланса пользователя
+        balance.total_balance -= price
         balance.save()
 
         transaction = TransactionHistory.objects.create(
-            user=user,
-            product=product,
-            price=product_price
+            user=user, product=product_id, price=price
         )
         return transaction
 
