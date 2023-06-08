@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import RegexValidator
+from car_reviews.models import Comment
+
 
 
 User = get_user_model()
@@ -37,6 +39,7 @@ class Car(models.Model):
     title = models.CharField(max_length=20, default='Untitled')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cars')
     brand = models.CharField(max_length=100, choices=Brand.choices)
+    price = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     color = models.CharField(max_length=40, choices=Color.choices)
     release = models.IntegerField(
         validators=[
@@ -49,7 +52,7 @@ class Car(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField(max_length=1000, blank=True)
-
+    # comments = models.ManyToManyField('car_reviews.Comment', related_name='cars')
 
     def __str__(self) -> str:
         return f'{self.title} | {self.brand} {str(self.release)} year'
