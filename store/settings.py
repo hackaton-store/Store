@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'product',
     'django_filters',
     'car_reviews',
-    'user_reviews'
+    'user_reviews',
+    'transactions',
 
 ]
 

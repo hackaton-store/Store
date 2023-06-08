@@ -20,6 +20,7 @@ class CarSerializer(ModelSerializer):
             'color', 'release',
             'image', 'id', 'status',
             'comments'
+
         ]
         extra_kwargs = {
             'user': {'read_only': True},
