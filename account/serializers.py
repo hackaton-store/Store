@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth import get_user_model, authenticate
-
+from django.contrib.auth import password_validation
 
 from .utilities import send_activation_code, create_activation_code, send_drop_password_code
 
@@ -16,13 +16,23 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'password_confirm')
+        fields = ('username', 'email', 'password', 'password_confirm', 'phone_number', 'city', 'name', 'age')
 
         extra_kwargs = {
             'password': {'write_only': True},
         }
 
 
+    def validate_password(self, password):
+        password_validation.validate_password(password, self.Meta.model)
+
+        return password
+
+
+    def validate_phone_number(self, phone_number):
+        if phone_number[0] != '+' or not phone_number[1:].isdigit():
+            raise serializers.ValidationError({'message': 'format is wrong'})
+        return phone_number
 
     def validate(self, attrs: dict):
         password = attrs.get('password')
@@ -168,3 +178,25 @@ class ChangeForgottenPassword(serializers.Serializer):
         user.set_password(new_password)
         user.activation_code = ''
         user.save()
+
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['username', 'name', 'age', 'email', 'city', 'cars', 'likes_given', 'likes_recieved', 'reviews_recieved', 'reviews_given']
+
+    
+    def to_representation(self, instance: User):
+        representation =  super().to_representation(instance)
+
+        representation['likes_given'] = len(representation['likes_given'])
+        representation['likes_recieved'] = len(representation['likes_recieved'])
+        representation['reviews_recieved'] = [{one.user.username: one.review_text} for one in instance.reviews_recieved.all()]
+        representation['reviews_given'] = len(representation['reviews_given'])
+
+
+        return representation
+

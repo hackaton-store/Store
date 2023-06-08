@@ -17,20 +17,30 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, password, **extra_info):
         extra_info.setdefault('is_active', False)
         extra_info.setdefault('is_staff', False)
+        extra_info.setdefault('is_moderator', False)
         return self._create(username, email, password, **extra_info)
     
 
     def create_superuser(self, username, email, password, **extra_info):
+        extra_info.setdefault('name', 'dalbaep')
+        extra_info.setdefault('age', 18)
+        extra_info.setdefault('city', 'yopta')
         extra_info.setdefault('is_active', True)
         extra_info.setdefault('is_staff', True)
+        extra_info.setdefault('is_moderator', True)
         return self._create(username, email, password, **extra_info)
     
 
 class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
+    name = models.CharField(max_length=50)
+    age = models.PositiveIntegerField()
+    city = models.CharField(max_length=300, blank=True)
+    phone_number = models.CharField(max_length=15)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_moderator = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=10, blank=True)
 
     REQUIRED_FIELDS = ['email']
@@ -39,7 +49,6 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def has_module_perms(self, app_label):
-        print(app_label)
         return self.is_staff
     
     def has_perm(self, obj=None):

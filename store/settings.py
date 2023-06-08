@@ -44,7 +44,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'account', #askat's app
-    'bank_card'
+    'product',
+    'django_filters',
+    'car_reviews',
+    'user_reviews'
+
 ]
 
 MIDDLEWARE = [
@@ -151,6 +155,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 AUTH_USER_MODEL = 'account.User'
+
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 
 
