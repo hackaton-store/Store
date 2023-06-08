@@ -1,36 +1,94 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import TransactionSerializer
-from .models import TransactionHistory
 
-class TransactionView(APIView):
-   
+
+from transactions.serializers import BalanceSerializer, BalanceTopUpSerializer, TransactionHistorySerializer
+from transactions.models import Balance, TransactionHistory
+
+
+
+class BalanceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    
+    def post(self, request):
+        serializer = BalanceSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    
+    
+    def get(self, request):
+        user = request.user
+        try:
+            balance = Balance.objects.get(user=user)
+            serializer = BalanceSerializer(balance)
+            return Response(serializer.data)
+        except Balance.DoesNotExist:
+            return Response(status=404)
+
+
+class BalanceTopUpView(APIView):
+
     permission_classes = [IsAuthenticated]
 
 
     def post(self, request):
-        serializer = TransactionSerializer(data=request.data)
+        serializer = BalanceTopUpSerializer(data=request.data, context={'request': request})
+       
         if serializer.is_valid():
-            transaction = serializer.save()
-            return Response(serializer.data, status=201)
+            amount = serializer.validated_data['amount']
+           
+            try:
+                balance = Balance.objects.get(user=request.user)
+            
+            except Balance.DoesNotExist:
+                balance = Balance.objects.create(user=request.user, total_balance=0)
+            
+            balance.total_balance += amount
+            balance.save()
+          
+            return Response({'message': 'Balance topped up successfully'}, status=200)
+       
         return Response(serializer.errors, status=400)
+    
 
-   
-    def get(self, request, transaction_id=None):
-        if transaction_id:
+class TransactionHistoryCreateView(CreateAPIView):
+    serializer_class = TransactionHistorySerializer
+    permission_classes = [IsAuthenticated]
 
-            transaction = TransactionHistory.objects.filter(id=transaction_id, user=request.user).first()
-            if transaction:
-                serializer = TransactionSerializer(transaction)
-                return Response(serializer.data)
-            else:
-                return Response({'error': 'Транзакция не найдена'}, status=404)
-        else:
 
-            if request.user.is_staff:
-                transactions = TransactionHistory.objects.all()
-                serializer = TransactionSerializer(transactions, many=True)
-                return Response(serializer.data)
-            else:
-                return Response({'error': 'Доступ запрещен'}, status=403)
+class TransactionHistoryListView(ListAPIView):
+    serializer_class = TransactionHistorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff or user.is_moderator:
+
+            return TransactionHistory.objects.all()
+
+
+        return TransactionHistory.objects.filter(user=user)
+    
+
+
+class TransactionHistoryDetailView(RetrieveAPIView):
+    serializer_class = TransactionHistorySerializer
+    queryset = TransactionHistory.objects.all()
+    permission_classes = [IsAuthenticated]
+
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+
+        if not user.is_staff and not user.is_moderator:
+
+            queryset = queryset.filter(user=user)
+
+        return queryset
