@@ -7,17 +7,17 @@ from rest_framework.request import Request
 
 from django_filters import rest_framework as filters
 
-from permissions.permissions import IsOwner, IsModeratorOrIsAdminUser
+from permissions.permissions import IsOwner, IsModeratorOrIsAdminUser, IsOwnerOrIsModeratorOrIsAdminUser
 from product.models import Car
 from product.serializers import CarSerializer
 
 
 
 def check_user(request: Request):
-        if not request.user.is_anonymous:
-            if (request.user.is_staff or request.user.is_moderator):
-                return True
-
+    if not request.user.is_anonymous:
+        if (request.user.is_staff or request.user.is_moderator):
+            return True
+        
 
 class CarViewSet(ModelViewSet):
     queryset = Car.objects.all()
@@ -41,19 +41,15 @@ class CarViewSet(ModelViewSet):
         if self.request.data.get('status'):
             if self.request.method in ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']:
                 self.permission_classes = [IsModeratorOrIsAdminUser]
-                print('ZAPROS NA STAFF')
-
-            # elif self.request.method in ['DELETE', 'PATCH', 'PUT'] and self.request.data.get('status'):
         else:
             if self.request.method == "GET":
                 self.permission_classes = [AllowAny]
             elif self.request.method == "POST":
                 self.permission_classes = [IsAuthenticated]
             elif self.request.method in ['DELETE', 'PATCH', 'PUT']:
-                self.permission_classes in [IsOwner, IsModeratorOrIsAdminUser]
-                print('ZAPROS NA OWNER')
-        
-        print(self.request.data.get('status'))
+                
+                self.permission_classes = [IsOwnerOrIsModeratorOrIsAdminUser]
+
         return super().get_permissions()
     
     
