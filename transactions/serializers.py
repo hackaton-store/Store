@@ -48,7 +48,7 @@ class TransactionHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionHistory
         fields = '__all__'
-        read_only_fields = ['user', 'transaction_time']
+        read_only_fields = ['user', 'transaction_time', 'seller']
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -59,22 +59,28 @@ class TransactionHistorySerializer(serializers.ModelSerializer):
         except Balance.DoesNotExist:
             raise serializers.ValidationError("User balance does not exist")
 
-        # Получение цены продукта по его идентификатору
+
         try:
             product = Car.objects.get(id=product_id)
             price = product.price
+            seller = product.user
+            
+
         except Car.DoesNotExist:
             raise serializers.ValidationError("Product does not exist")
 
         if balance.total_balance < price:
             raise serializers.ValidationError("Insufficient balance")
 
-        # Уменьшение баланса пользователя
+
         balance.total_balance -= price
         balance.save()
+        top_up_balance = Balance.objects.get(user=seller)
+        top_up_balance.total_balance +=price
+        top_up_balance.save()
 
         transaction = TransactionHistory.objects.create(
-            user=user, product=product_id, price=price
+            user=user, product=product_id, price=price, seller = seller
         )
         return transaction
 
