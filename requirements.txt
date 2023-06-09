@@ -5,3 +5,4 @@ psycopg2-binary
 django-rest-auth 
 django-allauth
 django-filter
+drf-yasg
