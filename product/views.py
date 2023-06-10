@@ -48,7 +48,7 @@ class CarViewSet(ModelViewSet):
         
 
     def retrieve(self, request, *args, **kwargs):
-        print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++', request)
+        
         self.serializer_class = OneCarSeralizer
         return super().retrieve(request, *args, **kwargs)    
 

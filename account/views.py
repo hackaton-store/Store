@@ -39,7 +39,6 @@ class LogoutView(DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request: Request):
-        print(request.user.username)
         Token.objects.get(user=request.user).delete()
         return Response({'message': 'Logged out'}, status=HTTP_204_NO_CONTENT)
     
