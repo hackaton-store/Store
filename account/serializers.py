@@ -97,7 +97,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'message': 'Username or password is wrong'})
         
         attrs['user'] = user
-        print(attrs)
+
         return attrs
     
 
@@ -149,7 +149,7 @@ class DropPasswordSerializer(serializers.Serializer):
         send_drop_password_code(email, user.activation_code)
 
 
-class ChangeForgottenPassword(serializers.Serializer):
+class ChangeForgottenPasswordSerializer(serializers.Serializer):
 
     code = serializers.CharField(max_length=10)
     new_password = serializers.CharField(max_length=128)

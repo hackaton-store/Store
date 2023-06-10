@@ -5,29 +5,11 @@ from django.db.models import Avg
 from car_reviews.serializers import CommentSerializer
 
 
-
-class CarSerializer(ModelSerializer):
-    comments = CommentSerializer(many=True, read_only=True)
+class AbstractCarSerializer(ModelSerializer):
 
 
     class Meta:
-        model = Car
-        # fields = '__all__'
-        fields = [
-            'title', 'description',
-            'price',
-            'user', 'brand',
-            'color', 'release',
-            'image', 'id', 'status',
-            'comments'
-        ]
-        extra_kwargs = {
-            'user': {'read_only': True},
-            'created_at': {'read_only': True},
-            'updated_at': {'read_only': True},
-            'comments': {'read_only': True},
-
-        }
+        abstact = True
 
     def to_representation(self, instance: Car):
         representation = super().to_representation(instance)
@@ -49,5 +31,43 @@ class CarSerializer(ModelSerializer):
         return super().update(instance, validated_data)
     
 
+class CarSerializer(AbstractCarSerializer):
 
+    class Meta:
+        model = Car
+        fields = [
+        'title', 'description',
+        'price',
+        'user', 'brand',
+        'color', 'release',
+        'image', 'id', 'status',
+
+        ]
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+            # 'rating': {'read_only': True},
+        }
+
+class OneCarSerializer(AbstractCarSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Car
+        fields = [
+        'title', 'description',
+        'price',
+        'user', 'brand',
+        'color', 'release',
+        'image', 'id', 'status',
+        'comments', 
+
+        ]
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+        }
     
+

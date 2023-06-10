@@ -15,6 +15,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('change-password/', ChangePasswordView.as_view(), name='change password'),
     path('drop-password/', DropPasswordView.as_view(), name='drop_password'),
-    path('set-forgotten-password/', ChangeForgottenPasswordView.as_view(), name='set forgotten password'),
+    path('change-forgotten-password/', ChangeForgottenPasswordView.as_view(), name='change forgotten password'),
     path('users/<int:user_id>/', UserView.as_view(), name='user-detail')
 ]

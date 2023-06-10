@@ -12,9 +12,9 @@ class CommentSerializer(serializers.ModelSerializer):
  
     class Meta:
         model = Comment
-        fields = ['car', 'text', 'created_at']
-        
+        fields = ['text', 'created_at']
         read_only_fields = ['user', 'created_at',]
+        
     
 
     def save(self, **kwargs):
@@ -35,8 +35,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['car'] = instance.car.brand
         representation['user'] = instance.user.username
+        # representation['car'] = instance.car.brand
         return representation
  
  

@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import CreateModelMixin, UpdateModelMixin
+from rest_framework.response import Response
 
 
 from car_reviews.models import Comment, Saved, Rating
@@ -21,6 +22,18 @@ class CommentViewSet(ModelViewSet):
         else:
             self.permission_classes = [IsOwner]
         return super().get_permissions()
+
+
+    def get_queryset(self):
+        if self.request.method == 'GET':
+            user = self.request.user
+            
+            if user.is_authenticated:
+                queryset = Comment.objects.filter(user=user)
+                return queryset
+            else:
+                return  Comment.objects.none()
+        return Comment.objects.all()
     
 
 class SavedViewSet(ModelViewSet):

@@ -28,4 +28,3 @@ class IsModeratorOrIsAdminUser(BasePermission):
 class IsOwnerOrIsModeratorOrIsAdminUser(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_moderator or request.user.is_staff or (request.user.is_authenticated and request.user == obj.user)
-
