@@ -47,9 +47,10 @@ class CarSerializer(AbstractCarSerializer):
             'user': {'read_only': True},
             'created_at': {'read_only': True},
             'updated_at': {'read_only': True},
+            # 'rating': {'read_only': True},
         }
 
-class OneCarSeralizer(AbstractCarSerializer):
+class OneCarSerializer(AbstractCarSerializer):
     comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
@@ -60,7 +61,7 @@ class OneCarSeralizer(AbstractCarSerializer):
         'user', 'brand',
         'color', 'release',
         'image', 'id', 'status',
-        'comments'
+        'comments', 
 
         ]
         extra_kwargs = {
@@ -69,3 +70,4 @@ class OneCarSeralizer(AbstractCarSerializer):
             'updated_at': {'read_only': True},
         }
     
+
