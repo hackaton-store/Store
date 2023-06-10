@@ -42,8 +42,6 @@ urlpatterns = [
     path('products/', include('product.urls')),
     path('api/v1/', include('car_reviews.urls')),
     path('api/v1/', include('user_reviews.urls')),
-    path('api/v1/', include('transactions.urls'))
-
 ]
 
 if settings.DEBUG:

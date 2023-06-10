@@ -37,7 +37,7 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=50)
     age = models.PositiveIntegerField()
     city = models.CharField(max_length=300, blank=True)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, unique=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_moderator = models.BooleanField(default=False)
