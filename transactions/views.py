@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 from transactions.serializers import BalanceSerializer, BalanceTopUpSerializer, TransactionHistorySerializer
@@ -12,15 +14,21 @@ from transactions.models import Balance, TransactionHistory
 class BalanceView(APIView):
     permission_classes = [IsAuthenticated]
 
-    
+    @swagger_auto_schema(
+        operation_description="post balance",
+        responses={201: BalanceSerializer()},
+    )
     def post(self, request):
         serializer = BalanceSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-    
-    
+        
+    @swagger_auto_schema(
+        operation_description="get balance",
+        responses={200: BalanceSerializer()},
+    )
     def get(self, request):
         user = request.user
         try:
@@ -35,7 +43,10 @@ class BalanceTopUpView(APIView):
 
     permission_classes = [IsAuthenticated]
 
-
+    @swagger_auto_schema(
+        operation_description="Top up balance",
+        responses={200: BalanceTopUpSerializer()},
+    )
     def post(self, request):
         serializer = BalanceTopUpSerializer(data=request.data, context={'request': request})
        
@@ -72,10 +83,8 @@ class TransactionHistoryListView(ListAPIView):
 
             return TransactionHistory.objects.all()
 
-
         return TransactionHistory.objects.filter(user=user)
     
-
 
 class TransactionHistoryDetailView(RetrieveAPIView):
     serializer_class = TransactionHistorySerializer

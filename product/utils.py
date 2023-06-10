@@ -2,6 +2,7 @@ from django_filters import rest_framework as filters
 from product.models import Car
 
 
+
 class CarFilter(filters.FilterSet):
     price = filters.RangeFilter()
     release = filters.RangeFilter()
@@ -16,3 +17,5 @@ class CarFilter(filters.FilterSet):
             'title': ['icontains'],
             'description': ['icontains'],
         }
+
+

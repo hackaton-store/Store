@@ -1,14 +1,21 @@
 from rest_framework.generics import CreateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_202_ACCEPTED, HTTP_200_OK 
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_202_ACCEPTED, HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-from account.serializers import RegistrationSerializer, ActivationSerializer, LoginSerializer, ChangePasswordSerializer, DropPasswordSerializer, ChangeForgottenPassword, UserSerializer
+from account.serializers import (
+                        RegistrationSerializer, ActivationSerializer, 
+                        LoginSerializer, ChangePasswordSerializer, 
+                        DropPasswordSerializer, ChangeForgottenPasswordSerializer, 
+                        UserSerializer
+                        )
 
 
 User = get_user_model()
@@ -38,8 +45,11 @@ class LoginView(ObtainAuthToken):
 class LogoutView(DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Delete password",
+    
+    )
     def delete(self, request: Request):
-        print(request.user.username)
         Token.objects.get(user=request.user).delete()
         return Response({'message': 'Logged out'}, status=HTTP_204_NO_CONTENT)
     
@@ -48,6 +58,31 @@ class LogoutView(DestroyAPIView):
 
 class ChangePasswordView(CreateAPIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Changing password",
+        responses={200: ChangePasswordSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'current_password',
+                openapi.IN_PATH,
+                description="Password",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'new_password',
+                openapi.IN_QUERY,
+                description="Password",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'password_confirm',
+                openapi.IN_QUERY,
+                description="Password",
+                type=openapi.TYPE_STRING
+            )
+        ]
+    )
     def post(self, request, *args, **kwargs):
         serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -58,6 +93,10 @@ class ChangePasswordView(CreateAPIView):
 
 
 class DropPasswordView(CreateAPIView):
+    @swagger_auto_schema(
+        operation_description="Delete password",
+        responses={200: DropPasswordSerializer()},
+    )
     def post(self, request, *args, **kwargs):
         serializer = DropPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -66,11 +105,15 @@ class DropPasswordView(CreateAPIView):
     
 
 class ChangeForgottenPasswordView(CreateAPIView):
+    @swagger_auto_schema(
+        operation_description="Change password",
+        responses={201: ChangeForgottenPasswordSerializer()},
+    )
     def post(self, request, *args, **kwargs):
-        serializer = ChangeForgottenPassword(data=request.data)
+        serializer = ChangeForgottenPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.set_new_password()
-        return Response({'message': 'Password changed successfully'}, status=HTTP_200_OK)
+        return Response({'message': 'Password changed successfully'}, status=HTTP_201_CREATED)
     
 
 class UserView(APIView):
