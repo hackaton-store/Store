@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth import password_validation
+from .tasks import send_activation_code_task
 
 from .utilities import send_activation_code, create_activation_code, send_drop_password_code
 
@@ -45,8 +46,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        create_activation_code(user)
-        send_activation_code(user)
+        user_id = user.id
+
+        send_activation_code_task.delay(user_id)
         return user
     
 

@@ -6,3 +6,5 @@ django-rest-auth
 django-allauth
 django-filter
 drf-yasg
+celery
+redis

@@ -23,6 +23,7 @@ def check_user(request: Request):
     return False
         
 
+
 class CarViewSet(ModelViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
