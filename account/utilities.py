@@ -1,3 +1,4 @@
+
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.conf import settings
@@ -9,7 +10,7 @@ def create_activation_code(user):
 
 def send_activation_code(user):
     message = f""" 
-    Thank you for registration! Your activation code is {user.activation_code} """
+    Thank you for registration! Your activation code is {user.activation_code} """   
     send_mail(subject='account activation',
               message=message,
               from_email=settings.EMAIL_HOST_USER,
@@ -25,3 +26,5 @@ def send_drop_password_code(email, code):
               from_email=settings.EMAIL_HOST_USER,
               recipient_list=[email],
               fail_silently=False)
+    
+    
