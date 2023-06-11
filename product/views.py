@@ -60,6 +60,7 @@ class CarViewSet(ModelViewSet):
         
 
     def retrieve(self, request, *args, **kwargs):
+
         self.serializer_class = OneCarSerializer
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -87,6 +88,7 @@ class CarViewSet(ModelViewSet):
 
         else:
                 return Response(serialized_data)
+
 
 
     def get_permissions(self):

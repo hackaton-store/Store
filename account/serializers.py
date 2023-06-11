@@ -99,6 +99,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'message': 'Username or password is wrong'})
         
         attrs['user'] = user
+
         return attrs
     
 
