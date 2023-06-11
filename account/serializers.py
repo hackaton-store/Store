@@ -2,9 +2,9 @@ from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth import password_validation
-from .tasks import send_activation_code_task
+from .tasks import send_activation_code_task, send_drop_password_code_task
 
-from .utilities import send_activation_code, create_activation_code, send_drop_password_code
+from .utilities import create_activation_code
 
 
 User = get_user_model()
@@ -147,7 +147,7 @@ class DropPasswordSerializer(serializers.Serializer):
         email = self.validated_data.get('email')
         user = User.objects.get(email=email)
         create_activation_code(user)
-        send_drop_password_code(email, user.activation_code)
+        send_drop_password_code_task.delay(email, user.activation_code)
 
 
 class ChangeForgottenPasswordSerializer(serializers.Serializer):
