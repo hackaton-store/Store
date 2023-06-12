@@ -38,10 +38,10 @@ urlpatterns = [
     path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     
     path('api/v1/auth/', include('account.urls')),
-    # path('api/v1/auth/', include('bank_card.urls')),
     path('products/', include('product.urls')),
     path('api/v1/', include('car_reviews.urls')),
     path('api/v1/', include('user_reviews.urls')),
+    path('api/v1/auth/', include('transactions.urls'))
 ]
 
 if settings.DEBUG:

@@ -41,7 +41,7 @@ class ActivationView(CreateAPIView):
 
 class LoginView(ObtainAuthToken):
     serializer_class=LoginSerializer
-
+    
 class LogoutView(DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
